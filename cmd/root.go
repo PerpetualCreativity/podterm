@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"github.com/PerpetualCreativity/podterm/utils"
+	"github.com/spf13/cobra"
 )
 
 var store = utils.Store{ FeedName: "feed.xml" }
@@ -14,8 +14,8 @@ var store = utils.Store{ FeedName: "feed.xml" }
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "podterm",
-	Short: "podcast CLI and TUI client",
-	Long: `podterm is an easy-to-use CLI and TUI client.`,
+	Short: "podcast CLI client",
+	Long: `podterm is an easy-to-use CLI podcast client.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 )
+
 type Image struct {
 	Link  string `xml:"link"`
 	Url   string `xml:"url"`
@@ -15,6 +16,7 @@ type AV struct {
 	Type   string `xml:"type,attr"`
 	Length string `xml:"length,attr"`
 }
+
 func (av AV) SmartType() string {
 	tb, ta, f := strings.Cut(av.Type, "/")
 	if f {
@@ -23,6 +25,7 @@ func (av AV) SmartType() string {
 		return tb
 	}
 }
+
 type Item struct {
 	Title       string `xml:"title"`
 	PubDate     string `xml:"pubDate"`
@@ -34,16 +37,18 @@ type Item struct {
 	Link        string `xml:"link"`
 	AV          AV     `xml:"enclosure"`
 }
+
 func (item Item) FileName() string {
 	return fmt.Sprintf("%s-%s.%s", item.Title, item.PubDate, item.AV.SmartType())
 }
+
 type Channel struct {
 	Title       string `xml:"title"`
 	Description string `xml:"description"`
+	FeedURL     string `xml:"new-feed-url"`
 	Language    string `xml:"language"`
 	Link        string `xml:"link"`
 	Copyright   string `xml:"copyright"`
-	Explicit    string `xml:"itunes:explicit"`
 	Image       Image  `xml:"image"`
 	Items       []Item `xml:"item"`
 }
@@ -57,4 +62,3 @@ func ParseFeed(xmlSource string) (Channel, error) {
 	err := xml.Unmarshal([]byte(xmlSource), &v)
 	return v.Channel, err
 }
-

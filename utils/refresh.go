@@ -11,7 +11,7 @@ import (
 
 type Store struct {
 	RootFolder string
-	FeedName string
+	FeedName   string
 }
 
 func newError(s string, i ...interface{}) error {
@@ -29,7 +29,9 @@ func (s Store) Add(link string) error {
 		return newError("Could not get XML feed for this channel from %s.", link)
 	}
 	channel, err := ParseFeed(string(xml))
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	path := filepath.Join(s.RootFolder, channel.Title)
 	_, err = os.Stat(path)
 	if !errors.Is(err, os.ErrNotExist) {
@@ -54,21 +56,47 @@ func (s Store) Refresh(title string, length int, overwrite bool) error {
 		return newError("Channel %s has not been added yet.", title)
 	}
 	channel, err := ParseFeed(string(xml))
-	// TODO: refresh feed
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
+
+	newFeed, err := http.Get(channel.FeedURL)
+	if err != nil {
+		return newError("Could not retrieve new feed at %s", channel.FeedURL)
+	}
+	feedContents, err := ioutil.ReadAll(newFeed.Body)
+	if err != nil {
+		return newError("Could not read response from %s", channel.FeedURL)
+	}
+	newFeed.Body.Close()
+	fp := filepath.Join(s.RootFolder, title, s.FeedName)
+	err = os.WriteFile(fp, feedContents, 0666)
+	if err != nil {
+		return newError("Could not write to file %s", fp)
+	}
+
+	channel, err = ParseFeed(string(feedContents))
+	if err != nil {
+		return err
+	}
 
 	for _, item := range channel.Items[0:length] {
 		_, err := os.Stat(fmt.Sprintf("%s-%s", item.Title, item.PubDate))
 		if overwrite || errors.Is(err, os.ErrNotExist) {
 			r, err := http.Get(item.AV.Url)
 			if err != nil {
-				return newError("Could not retrieve cast at %s.", item.AV.Url)
+				return newError("Could not retrieve episode at %s", item.AV.Url)
 			}
-			defer r.Body.Close()
 			cast, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				return newError("Could not read response from %s", item.AV.Url)
+			}
+			r.Body.Close()
 			fp := filepath.Join(s.RootFolder, title, item.FileName())
 			err = os.WriteFile(fp, cast, 0666)
-			if err != nil { return newError("Could not write to file %s.", fp) }
+			if err != nil {
+				return newError("Could not write to file %s", fp)
+			}
 		}
 	}
 
@@ -77,7 +105,9 @@ func (s Store) Refresh(title string, length int, overwrite bool) error {
 
 func (s Store) RefreshAll(length int) error {
 	list, err := os.ReadDir(s.RootFolder)
-	if err != nil { return newError("Could not access %s", s.RootFolder) }
+	if err != nil {
+		return newError("Could not access %s", s.RootFolder)
+	}
 	for _, l := range list {
 		err := s.Refresh(l.Name(), length, false)
 		if err != nil {
@@ -89,7 +119,9 @@ func (s Store) RefreshAll(length int) error {
 
 func (s Store) Remove(title string) error {
 	list, err := os.ReadDir(s.RootFolder)
-	if err != nil { return newError("Could not access %s", s.RootFolder) }
+	if err != nil {
+		return newError("Could not access %s", s.RootFolder)
+	}
 	exists := false
 	for _, l := range list {
 		if l.Name() == title {

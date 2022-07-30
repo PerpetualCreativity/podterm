@@ -1,12 +1,27 @@
-package parse
+package utils
 
 import (
 	"encoding/xml"
+	"fmt"
+	"strings"
 )
 type Image struct {
 	Link  string `xml:"link"`
 	Url   string `xml:"url"`
 	Title string `xml:"title"`
+}
+type AV struct {
+	Url    string `xml:"url,attr"`
+	Type   string `xml:"type,attr"`
+	Length string `xml:"length,attr"`
+}
+func (av AV) SmartType() string {
+	tb, ta, f := strings.Cut(av.Type, "/")
+	if f {
+		return ta
+	} else {
+		return tb
+	}
 }
 type Item struct {
 	Title       string `xml:"title"`
@@ -17,6 +32,10 @@ type Item struct {
 	Subtitle    string `xml:"itunes:subtitle"`
 	Description string `xml:"itunes:description"`
 	Link        string `xml:"link"`
+	AV          AV     `xml:"enclosure"`
+}
+func (item Item) FileName() string {
+	return fmt.Sprintf("%s-%s.%s", item.Title, item.PubDate, item.AV.SmartType())
 }
 type Channel struct {
 	Title       string `xml:"title"`
@@ -26,7 +45,6 @@ type Channel struct {
 	Copyright   string `xml:"copyright"`
 	Explicit    string `xml:"itunes:explicit"`
 	Image       Image  `xml:"image"`
-	FeedURL     string `xml:"itunes:new-feed-url"`
 	Items       []Item `xml:"item"`
 }
 

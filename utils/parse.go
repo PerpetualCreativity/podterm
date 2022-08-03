@@ -31,10 +31,10 @@ type Item struct {
 	Title       string `xml:"title"`
 	PubDate     string `xml:"pubDate"`
 	Guid        string `xml:"guid"`
-	Duration    string `xml:"itunes:duration"`
-	Explicit    string `xml:"itunes:explicit"`
-	Subtitle    string `xml:"itunes:subtitle"`
-	Description string `xml:"itunes:description"`
+	Duration    string `xml:"duration"`
+	Explicit    string `xml:"explicit"`
+	Subtitle    string `xml:"subtitle"`
+	Description string `xml:"description"`
 	Link        string `xml:"link"`
 	AV          AV     `xml:"enclosure"`
 }

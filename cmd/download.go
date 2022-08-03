@@ -32,8 +32,10 @@ episode.`,
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		chf, _, err := store.FindChannel(args[0])
+		cobra.CheckErr(err)
 		overwrite, _ := cmd.Flags().GetBool("overwrite")
-		I, _ := strconv.Atoi(args[0])
+		I, _ := strconv.Atoi(chf)
 		J := I
 		if len(args) == 2 {
 			J, _ = strconv.Atoi(args[1])
@@ -43,7 +45,7 @@ episode.`,
 			done := make(chan bool)
 			finish = append(finish, done)
 			go func(i int) {
-				_, err := store.GetEpisode(args[0], i, overwrite)
+				_, err := store.GetEpisode(chf, i, overwrite)
 				if err != nil { fmt.Println(err) }
 				done <- true
 			}(i)

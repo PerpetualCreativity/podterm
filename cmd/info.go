@@ -29,7 +29,9 @@ var infoCmd = &cobra.Command{
 		},
 	),
 	Run: func(cmd *cobra.Command, args []string) {
-		ch, err := utils.ParseFile(filepath.Join(store.RootFolder, args[0], store.FeedName))
+		chf, _, err := store.FindChannel(args[0])
+		cobra.CheckErr(err)
+		ch, err := utils.ParseFile(filepath.Join(store.RootFolder, chf, store.FeedName))
 		cobra.CheckErr(err)
 		info := ""
 		if len(args) == 1 {

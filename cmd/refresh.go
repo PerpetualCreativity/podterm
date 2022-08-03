@@ -12,11 +12,12 @@ var refreshCmd = &cobra.Command{
 	Long: `Refresh all channel feeds, or specified channel feed only.`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		var err error
+		chf, _, err := store.FindChannel(args[0])
+		cobra.CheckErr(err)
 		if len(args) == 0 {
 			err = store.RefreshAll()
 		} else {
-			err = store.Refresh(args[0])
+			err = store.Refresh(chf)
 		}
 		if err != nil {
 			fmt.Println(err)

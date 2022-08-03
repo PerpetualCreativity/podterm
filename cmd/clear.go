@@ -18,13 +18,24 @@ var clearCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		var err error
 		if all, _ := cmd.Flags().GetBool("all"); all {
-			err = store.ClearAll()
+			err := store.ClearAll()
+			cobra.CheckErr(err)
 		} else {
-			err = store.Clear(args[0])
+			chf, opts, err := store.FindChannel(args[0])
+			cobra.CheckErr(err)
+			if len(opts) > 1 {
+				fmt.Printf("There are multiple matches for \"%s\".\n", args[0])
+				fmt.Println("Since `clear` is a destructive command, the channel must be unambiguously specified.")
+				fmt.Println("Matches:")
+				for _, o := range opts {
+					fmt.Printf("- %s\n", o)
+				}
+			} else {
+				err = store.Clear(chf)
+				cobra.CheckErr(err)
+			}
 		}
-		cobra.CheckErr(err)
 	},
 }
 

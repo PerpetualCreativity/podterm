@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
+
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 func (s Store) ChannelList() ([]string, error) {
@@ -22,6 +25,23 @@ func (s Store) ChannelList() ([]string, error) {
 		}
 	}
 	return filtered, nil
+}
+
+func (s Store) FindChannel(search string) (result string, options []string, err error) {
+	in, err := s.ChannelList()
+	if err != nil { return "", nil, err }
+	f := fuzzy.RankFindNormalizedFold(search, in)
+	if len(f) == 0 {
+		return "", nil, fmt.Errorf("no matches for %s found", search)
+	}
+	if len(f) > 1 {
+		sort.Sort(f)
+	}
+	for _, t := range f {
+		options = append(options, t.Target)
+	}
+	result = f[0].Target
+	return
 }
 
 func (s Store) DownloadedEpisodeList(channel string) ([]Item, error) {

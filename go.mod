@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/JohannesKaufmann/html-to-markdown v1.3.5
 	github.com/charmbracelet/glamour v0.5.0
+	github.com/lithammer/fuzzysearch v1.1.5
 	github.com/spf13/cobra v1.4.0
 )
 
@@ -29,4 +30,5 @@ require (
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
+	golang.org/x/text v0.3.7 // indirect
 )

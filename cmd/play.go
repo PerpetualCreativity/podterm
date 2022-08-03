@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os/exec"
 	"strconv"
 
@@ -16,13 +15,15 @@ var playCmd = &cobra.Command{
 Nth episode in reverse-chronological order.`,
 	Args: cobra.RangeArgs(1, 2),
 	Run: func(cmd *cobra.Command, args []string) {
+		chf, _, err := store.FindChannel(args[0])
+		cobra.CheckErr(err)
 		i := 0
 		if len(args) == 2 {
 			in, err := strconv.Atoi(args[1])
 			cobra.CheckErr(err)
 			i = in
 		}
-		path, err := store.GetEpisode(args[0], i, false)
+		path, err := store.GetEpisode(chf, i, false)
 		cobra.CheckErr(err)
 		_, err = exec.Command("open", path).Output()
 		cobra.CheckErr(err)

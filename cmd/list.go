@@ -20,19 +20,21 @@ If --downloaded-only is passed, only downloaded episodes are listed.`,
 		if len(args) == 0 {
 			channels, err := store.ChannelList()
 			cobra.CheckErr(err)
-			for i, l := range channels {
-				fmt.Printf("%d: %s\n", i, l)
+			for _, l := range channels {
+				fmt.Printf("- %s\n", l)
 			}
 		} else {
-			length, _ := cmd.Flags().GetInt("length")
+			length, err := cmd.Flags().GetInt("length")
 			downloaded, _ := cmd.Flags().GetBool("downloaded-only")
+			chf, _, err := store.FindChannel(args[0])
+			cobra.CheckErr(err)
 			var items []utils.Item
 			if downloaded {
-				i, err := store.DownloadedEpisodeList(args[0])
+				i, err := store.DownloadedEpisodeList(chf)
 				cobra.CheckErr(err)
 				items = i
 			} else {
-				ch, err := utils.ParseFile(filepath.Join(store.RootFolder, args[0], store.FeedName))
+				ch, err := utils.ParseFile(filepath.Join(store.RootFolder, chf, store.FeedName))
 				cobra.CheckErr(err)
 				items = ch.Items
 			}

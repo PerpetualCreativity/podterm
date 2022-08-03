@@ -45,43 +45,64 @@ func (s Store) Add(link string) error {
 	return nil
 }
 
-func (s Store) Refresh(title string) error {
+func (s Store) Refresh(title string) ([]Item, error) {
 	channel, err := ParseFile(filepath.Join(s.RootFolder, title, s.FeedName))
 	if err != nil {
-		return err
+		return nil, err
+	}
+	oldTop := ""
+	if channel.Items != nil && len(channel.Items) != 0 {
+		oldTop = channel.Items[0].Guid
 	}
 
 	newFeed, err := http.Get(channel.FeedURL)
 	if err != nil {
-		return fmt.Errorf("could not retrieve new feed at %s", channel.FeedURL)
+		return nil, fmt.Errorf("could not retrieve new feed at %s", channel.FeedURL)
 	}
 	feedContents, err := ioutil.ReadAll(newFeed.Body)
 	if err != nil {
-		return fmt.Errorf("could not read response from %s", channel.FeedURL)
+		return nil, fmt.Errorf("could not read response from %s", channel.FeedURL)
 	}
 	err = newFeed.Body.Close()
 	if err != nil {
-		return fmt.Errorf("could not read response from %s", channel.FeedURL)
+		return nil, fmt.Errorf("could not read response from %s", channel.FeedURL)
 	}
 	fp := filepath.Join(s.RootFolder, title, s.FeedName)
 	err = os.WriteFile(fp, feedContents, 0666)
 	if err != nil {
-		return fmt.Errorf("could not write to file %s", fp)
+		return nil, fmt.Errorf("could not write to file %s", fp)
 	}
 
-	return nil
+	channel, err = ParseFeed(string(feedContents))
+	if err != nil { return nil, err }
+	var newItems []Item
+	for i:=0; channel.Items[i].Guid!=oldTop; i++ {
+		newItems = append(newItems, channel.Items[i])
+	}
+
+	return newItems, nil
 }
 
-func (s Store) RefreshAll() error {
+type Collection struct {
+	Channel  string
+	Episodes []Item
+}
+
+func (s Store) RefreshAll() ([]Collection, error) {
 	list, err := os.ReadDir(s.RootFolder)
 	if err != nil {
-		return fmt.Errorf("could not access %s", s.RootFolder)
+		return nil, fmt.Errorf("could not access %s", s.RootFolder)
 	}
-	for _, l := range list {
-		err = s.Refresh(l.Name())
+	newCollections := make([]Collection, len(list))
+	for i, l := range list {
+		ni, err := s.Refresh(l.Name())
 		if err != nil {
-			return err
+			return nil, err
+		}
+		newCollections[i] = Collection{
+			Channel: l.Name(),
+			Episodes: ni,
 		}
 	}
-	return nil
+	return newCollections, nil
 }

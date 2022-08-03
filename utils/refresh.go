@@ -85,25 +85,3 @@ func (s Store) RefreshAll() error {
 	}
 	return nil
 }
-
-func (s Store) Remove(title string) error {
-	list, err := os.ReadDir(s.RootFolder)
-	if err != nil {
-		return fmt.Errorf("could not access %s", s.RootFolder)
-	}
-	exists := false
-	for _, l := range list {
-		if l.Name() == title {
-			exists = true
-		}
-	}
-	if exists {
-		path := filepath.Join(s.RootFolder, title)
-		err := os.RemoveAll(path)
-		if err != nil {
-			return fmt.Errorf("could not remove %s", path)
-		}
-		return nil
-	}
-	return fmt.Errorf("specified channel (%s) does not exist", title)
-}

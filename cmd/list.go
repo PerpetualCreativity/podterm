@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/PerpetualCreativity/podterm/utils"
 	"github.com/spf13/cobra"
+	"path/filepath"
 )
 
 // listCmd represents the list command
@@ -12,18 +14,18 @@ var listCmd = &cobra.Command{
 	Long: `Lists all channels, or if a channel is specified, episodes in a channel`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		var list []string
 		if len(args) == 0 {
 			channels, err := store.ChannelList()
 			cobra.CheckErr(err)
-			list = channels
+			for i, l := range channels {
+				fmt.Printf("%d: %s\n", i, l)
+			}
 		} else {
-			episodes, err := store.EpisodeList(args[0])
+			ch, err := utils.ParseFile(filepath.Join(store.RootFolder, args[0], store.FeedName))
 			cobra.CheckErr(err)
-			list = episodes
-		}
-		for i, l := range list {
-			fmt.Printf("%d: %s\n", i, l)
+			for i, episode := range ch.Items {
+				fmt.Printf("#%d: %s\n", i, episode.Title)
+			}
 		}
 	},
 }

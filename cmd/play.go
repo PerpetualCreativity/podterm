@@ -22,7 +22,7 @@ Nth episode in reverse-chronological order.`,
 			cobra.CheckErr(err)
 			i = in
 		}
-		path, err := store.GetEpisodePath(args[0], i)
+		path, err := store.GetEpisode(args[0], i, false)
 		cobra.CheckErr(err)
 		_, err = exec.Command(fmt.Sprintf("open %s", path)).Output()
 		cobra.CheckErr(err)

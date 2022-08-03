@@ -46,10 +46,10 @@ func (s Store) Add(link string) error {
 	if err != nil {
 		return newError("Could not write to feed file %s.", feed)
 	}
-	return s.Refresh(channel.Title, 5, true)
+	return nil
 }
 
-func (s Store) Refresh(title string, length int, overwrite bool) error {
+func (s Store) Refresh(title string) error {
 	channel, err := ParseFile(filepath.Join(s.RootFolder, title, s.FeedName))
 	if err != nil {
 		return err
@@ -63,48 +63,26 @@ func (s Store) Refresh(title string, length int, overwrite bool) error {
 	if err != nil {
 		return newError("Could not read response from %s", channel.FeedURL)
 	}
-	newFeed.Body.Close()
+	err = newFeed.Body.Close()
+	if err != nil {
+		return newError("Could not read response from %s", channel.FeedURL)
+	}
 	fp := filepath.Join(s.RootFolder, title, s.FeedName)
 	err = os.WriteFile(fp, feedContents, 0666)
 	if err != nil {
 		return newError("Could not write to file %s", fp)
 	}
 
-	channel, err = ParseFeed(string(feedContents))
-	if err != nil {
-		return err
-	}
-
-	for _, item := range channel.Items[0:length] {
-		_, err := os.Stat(fmt.Sprintf("%s-%s", item.Title, item.PubDate))
-		if overwrite || errors.Is(err, os.ErrNotExist) {
-			r, err := http.Get(item.AV.Url)
-			if err != nil {
-				return newError("Could not retrieve episode at %s", item.AV.Url)
-			}
-			cast, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				return newError("Could not read response from %s", item.AV.Url)
-			}
-			r.Body.Close()
-			fp := filepath.Join(s.RootFolder, title, item.FileName())
-			err = os.WriteFile(fp, cast, 0666)
-			if err != nil {
-				return newError("Could not write to file %s", fp)
-			}
-		}
-	}
-
 	return nil
 }
 
-func (s Store) RefreshAll(length int) error {
+func (s Store) RefreshAll() error {
 	list, err := os.ReadDir(s.RootFolder)
 	if err != nil {
 		return newError("Could not access %s", s.RootFolder)
 	}
 	for _, l := range list {
-		err := s.Refresh(l.Name(), length, false)
+		err = s.Refresh(l.Name())
 		if err != nil {
 			return err
 		}

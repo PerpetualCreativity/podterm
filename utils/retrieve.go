@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func (s Store) ChannelList() ([]string, error) {
@@ -20,6 +21,24 @@ func (s Store) ChannelList() ([]string, error) {
 		}
 	}
 	return filtered, nil
+}
+
+func (s Store) DownloadedEpisodeList(channel string) ([]Item, error) {
+	list, err := os.ReadDir(filepath.Join(s.RootFolder, channel))
+	if err != nil {
+		return nil, newError("Could not access %s", s.RootFolder)
+	}
+	ch, err := ParseFile(filepath.Join(s.RootFolder, channel, s.FeedName))
+	if err != nil { return nil, err }
+	downloaded := make([]Item, 0, len(list))
+	for _, episode := range ch.Items {
+		for _, l := range list {
+			if strings.Split(l.Name(), ".")[0] != episode.Guid {
+				downloaded = append(downloaded, episode)
+			}
+		}
+	}
+	return downloaded, nil
 }
 
 func (s Store) GetEpisode(channel string, index int, overwrite bool) (string, error) {

@@ -9,9 +9,12 @@ import (
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use:   "list [channel]",
+	Use:   "list [channel] [-l, --length N] [-d, --downloaded-only]",
 	Short: "Lists all channels, or if a channel is specified, episodes in a channel",
-	Long: `Lists all channels, or if a channel is specified, episodes in a channel`,
+	Long: `Lists all channels, or if a channel is specified, episodes in a channel.
+Only lists latest 10 episodes by default; this can be changed with --length. If N<0,
+all episodes will be listed (piping to a pager is encouraged).
+If --downloaded-only is passed, only downloaded episodes are listed.`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
@@ -21,10 +24,24 @@ var listCmd = &cobra.Command{
 				fmt.Printf("%d: %s\n", i, l)
 			}
 		} else {
-			ch, err := utils.ParseFile(filepath.Join(store.RootFolder, args[0], store.FeedName))
-			cobra.CheckErr(err)
-			for i, episode := range ch.Items {
-				fmt.Printf("#%d: %s\n", i, episode.Title)
+			length, _ := cmd.Flags().GetInt("length")
+			downloaded, _ := cmd.Flags().GetBool("downloaded-only")
+			var items []utils.Item
+			if downloaded {
+				i, err := store.DownloadedEpisodeList(args[0])
+				cobra.CheckErr(err)
+				items = i
+			} else {
+				ch, err := utils.ParseFile(filepath.Join(store.RootFolder, args[0], store.FeedName))
+				cobra.CheckErr(err)
+				items = ch.Items
+			}
+			b := length
+			if length<0 || len(items)<length {
+				b = len(items)
+			}
+			for i := 0; i<b; i++ {
+				fmt.Printf("#%d: %s\n", i, items[i].Title)
 			}
 		}
 	},
@@ -32,4 +49,16 @@ var listCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(listCmd)
+	refreshCmd.Flags().BoolP(
+		"downloaded-only",
+		"d",
+		false,
+		"list only downloaded episodes",
+	)
+	refreshCmd.Flags().IntP(
+		"length",
+		"l",
+		10,
+		"maximum number of episodes to list",
+	)
 }

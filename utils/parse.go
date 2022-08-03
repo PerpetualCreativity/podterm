@@ -40,7 +40,7 @@ type Item struct {
 }
 
 func (item Item) FileName() string {
-	return fmt.Sprintf("%s-%s.%s", item.Title, item.PubDate, item.AV.SmartType())
+	return fmt.Sprintf("%s.%s", item.Guid, item.AV.SmartType())
 }
 
 type Channel struct {

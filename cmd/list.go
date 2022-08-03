@@ -10,7 +10,7 @@ import (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list [channel] [-l, --length N] [-d, --downloaded-only]",
-	Short: "Lists all channels, or if a channel is specified, episodes in a channel",
+	Short: "List all channels, or if a channel is specified, episodes in a channel",
 	Long: `Lists all channels, or if a channel is specified, episodes in a channel.
 Only lists latest 10 episodes by default; this can be changed with --length. If N<0,
 all episodes will be listed (piping to a pager is encouraged).

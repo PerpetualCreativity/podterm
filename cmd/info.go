@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/charmbracelet/glamour"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PerpetualCreativity/podterm/utils"
+	"github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 )
 
@@ -59,16 +59,14 @@ var infoCmd = &cobra.Command{
 				NewConverter("", true, nil).
 				ConvertString(episode.Description)
 			info = fmt.Sprintf(
-				"# %s\n\nThis episode is %s long and was published on %s\n\n%s\n",
+				"%s\n\nThis episode is %s long and was published on %s\n\n%s\n\n",
 				episode.Title,
 				time,
 				episode.PubDate,
 				desc,
 			)
 		}
-		r, _ := glamour.NewTermRenderer(glamour.WithAutoStyle())
-		out, _ := r.Render(info)
-		fmt.Print(out)
+		fmt.Print(wordwrap.WrapString(info, 120))
 	},
 }
 

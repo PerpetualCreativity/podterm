@@ -50,12 +50,7 @@ func (s Store) Add(link string) error {
 }
 
 func (s Store) Refresh(title string, length int, overwrite bool) error {
-	path := filepath.Join(s.RootFolder, title, s.FeedName)
-	xml, err := os.ReadFile(path)
-	if err != nil {
-		return newError("Channel %s has not been added yet.", title)
-	}
-	channel, err := ParseFeed(string(xml))
+	channel, err := ParseFile(filepath.Join(s.RootFolder, title, s.FeedName))
 	if err != nil {
 		return err
 	}

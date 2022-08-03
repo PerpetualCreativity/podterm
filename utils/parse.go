@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/xml"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -61,4 +62,16 @@ func ParseFeed(xmlSource string) (Channel, error) {
 
 	err := xml.Unmarshal([]byte(xmlSource), &v)
 	return v.Channel, err
+}
+
+func ParseFile(path string) (Channel, error) {
+	xml, err := os.ReadFile(path)
+	if err != nil {
+		return Channel{}, newError("Could not access %s", path)
+	}
+	feed, err := ParseFeed(string(xml))
+	if err != nil {
+		return Channel{}, err
+	}
+	return feed, nil
 }

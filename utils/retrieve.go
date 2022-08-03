@@ -36,20 +36,13 @@ func (s Store) EpisodeList(channel string) ([]string, error) {
 }
 
 func (s Store) GetEpisodePath(channel string, index int) (string, error) {
-	path := filepath.Join(s.RootFolder, channel, s.FeedName)
-	xml, err := os.ReadFile(path)
-	if err != nil {
-		return "", newError("Could not access %s", path)
-	}
-	ch, err := ParseFeed(string(xml))
-	if err != nil {
-		return "", err
-	}
+	ch, err := ParseFile(filepath.Join(s.RootFolder, channel, s.FeedName))
+	if err != nil { return "", err }
 	if index > len(ch.Items) {
 		return "", newError("The %s episode does not exist.", humanize.Ordinal(index))
 	}
 	episode := ch.Items[index]
-	path = filepath.Join(s.RootFolder, channel, episode.FileName())
+	path := filepath.Join(s.RootFolder, channel, episode.FileName())
 	_, err = os.Stat(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return "", newError("The %s episode has not been downloaded", humanize.Ordinal(index))

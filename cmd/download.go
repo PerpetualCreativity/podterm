@@ -57,7 +57,7 @@ episode.`,
 
 func init() {
 	rootCmd.AddCommand(downloadCmd)
-	refreshCmd.Flags().BoolP(
+	downloadCmd.Flags().BoolP(
 		"overwrite",
 		"o",
 		false,

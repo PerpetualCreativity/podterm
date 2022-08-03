@@ -24,7 +24,7 @@ Nth episode in reverse-chronological order.`,
 		}
 		path, err := store.GetEpisode(args[0], i, false)
 		cobra.CheckErr(err)
-		_, err = exec.Command(fmt.Sprintf("open %s", path)).Output()
+		_, err = exec.Command("open", path).Output()
 		cobra.CheckErr(err)
 	},
 }

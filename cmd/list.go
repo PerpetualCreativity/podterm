@@ -49,13 +49,13 @@ If --downloaded-only is passed, only downloaded episodes are listed.`,
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	refreshCmd.Flags().BoolP(
+	listCmd.Flags().BoolP(
 		"downloaded-only",
 		"d",
 		false,
 		"list only downloaded episodes",
 	)
-	refreshCmd.Flags().IntP(
+	listCmd.Flags().IntP(
 		"length",
 		"l",
 		10,

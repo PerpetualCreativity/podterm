@@ -8,8 +8,8 @@ import (
 // clearCmd represents the clear command
 var clearCmd = &cobra.Command{
 	Use:   "clear channel OR clear --all",
-	Short: "Delete all downloaded episodes from a channel, or all channels",
-	Long: `Delete all downloaded episodes from a channel, or all channels`,
+	Short: "Delete all downloaded episodes from a channel, or from all channels",
+	Long: `Delete all downloaded episodes from a channel, or from all channels`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		all, _ := cmd.Flags().GetBool("all")
 		if (all&&len(args)!=0) || len(args)!=1 {

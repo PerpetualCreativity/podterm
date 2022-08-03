@@ -8,8 +8,8 @@ import (
 // refreshCmd represents the refresh command
 var refreshCmd = &cobra.Command{
 	Use:   "refresh [channel]",
-	Short: "Refresh all channel feeds, or specified channel feed only.",
-	Long: `Refresh all channel feeds, or specified channel feed only.`,
+	Short: "Refresh all channel feeds, or only the specified channel feed.",
+	Long: `Refresh all channel feeds, or only the specified channel feed.`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		chf, _, err := store.FindChannel(args[0])

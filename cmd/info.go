@@ -14,9 +14,10 @@ import (
 
 // infoCmd represents the info command
 var infoCmd = &cobra.Command{
-	Use:   "info channel [episode_index]",
+	Use:   "info channel [I]",
 	Short: "Get detailed information about an episode",
-	Long: `Get detailed information about an episode`,
+	Long: `Get detailed information about episode I
+(reverse-chronological indexing)`,
 	Args: cobra.MatchAll(
 		cobra.RangeArgs(1, 2),
 		func(cmd *cobra.Command, args []string) error {

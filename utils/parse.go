@@ -44,11 +44,13 @@ func (item Item) FileName() string {
 }
 
 type Channel struct {
+	FeedURL struct {
+		Href string `xml:"href,attr"`
+	} `xml:"atom link"`
 	Title       string `xml:"title"`
 	Description string `xml:"description"`
-	FeedURL     string `xml:"new-feed-url"`
 	Language    string `xml:"language"`
-	Link        string `xml:"link"`
+	Link        string `xml:"_ link"`
 	Copyright   string `xml:"copyright"`
 	Image       Image  `xml:"image"`
 	Items       []Item `xml:"item"`
@@ -60,7 +62,13 @@ func ParseFeed(xmlSource string) (Channel, error) {
 	}
 	v := Result{}
 
-	err := xml.Unmarshal([]byte(xmlSource), &v)
+	xmlSource = strings.ReplaceAll(xmlSource, " xmlns:atom=\"http://www.w3.org/2005/Atom\"", "")
+
+	decoder := xml.NewDecoder(strings.NewReader(xmlSource))
+	decoder.DefaultSpace = "_"
+
+	err := decoder.Decode(&v)
+
 	return v.Channel, err
 }
 

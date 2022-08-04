@@ -58,17 +58,17 @@ func (s Store) Refresh(title string) ([]Item, error) {
 		oldTop = channel.Items[0].Guid
 	}
 
-	newFeed, err := http.Get(channel.FeedURL)
+	newFeed, err := http.Get(channel.FeedURL.Href)
 	if err != nil {
-		return nil, fmt.Errorf("could not retrieve new feed at %s", channel.FeedURL)
+		return nil, fmt.Errorf("could not retrieve new feed at %s", channel.FeedURL.Href)
 	}
 	feedContents, err := ioutil.ReadAll(newFeed.Body)
 	if err != nil {
-		return nil, fmt.Errorf("could not read response from %s", channel.FeedURL)
+		return nil, fmt.Errorf("could not read response from %s", channel.FeedURL.Href)
 	}
 	err = newFeed.Body.Close()
 	if err != nil {
-		return nil, fmt.Errorf("could not read response from %s", channel.FeedURL)
+		return nil, fmt.Errorf("could not read response from %s", channel.FeedURL.Href)
 	}
 	fp := filepath.Join(s.RootFolder, title, s.FeedName)
 	err = os.WriteFile(fp, feedContents, 0666)

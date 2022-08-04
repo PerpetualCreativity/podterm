@@ -19,10 +19,13 @@ func (s Store) Add(link string) error {
 	if err != nil {
 		return fmt.Errorf("could not reach %s", link)
 	}
-	defer r.Body.Close()
 	xml, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return fmt.Errorf("could not get XML feed for this channel from %s", link)
+	}
+	err = r.Body.Close()
+	if err != nil {
+		return fmt.Errorf("could not read feed from %s")
 	}
 	channel, err := ParseFeed(string(xml))
 	if err != nil {

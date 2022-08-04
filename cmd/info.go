@@ -37,7 +37,7 @@ var infoCmd = &cobra.Command{
 		info := ""
 		if len(args) == 1 {
 			info = fmt.Sprintf(
-				"# %s\n\n(%s)\n\n%s\n\nCopyright %s\n",
+				"%s (%s)\n\n%s\n\nCopyright %s\n",
 				ch.Title,
 				ch.Link,
 				ch.Description,
